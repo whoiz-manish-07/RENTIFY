@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+.cache/
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+*.log
+*.zip
+*.pdf
+.env
+.env.*
+!.env.example
+
+# Browser evidence and temporary capture output
+diagnostic-*.png
+RENTIFY_DOCUMENTATION_ASSETS/
+SCREENSHOT_GUIDE.md
+REQUIREMENT_AUDIT.md
+RENTIFY_CODEX_SCREENSHOT_RECAPTURE_PROMPT.md

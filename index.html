@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-theme-preference="system">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="RENTIFY is a polished demo marketplace for renting quality equipment by the day.">
+    <meta name="theme-color" content="#FAFAF9">
+    <title>RENTIFY — Better things, borrowed.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script>tailwind = { config: { prefix: 'tw-', corePlugins: { preflight: false } } };</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/styles.css?v=20261112">
+    <script>
+      try {
+        const storedTheme = localStorage.getItem('rentify_theme_v1');
+        const savedTheme = ['light', 'dark', 'system'].includes(storedTheme) ? storedTheme : 'system';
+        const resolvedTheme = savedTheme === 'system'
+          ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : savedTheme;
+        document.documentElement.dataset.theme = resolvedTheme;
+        document.documentElement.dataset.themePreference = savedTheme;
+      } catch (_) {}
+    </script>
+  </head>
+  <body class="tw-antialiased">
+    <a class="skip-link" href="#app">Skip to content</a>
+    <div class="announcement" role="status">
+      <div class="site-container announcement__inner">
+        <span>Free cancellation up to 24 hours before pickup</span>
+        <span class="announcement__detail">Quality checked · Clear daily pricing</span>
+      </div>
+    </div>
+    <header class="site-header" data-site-header>
+      <div class="site-container header-inner">
+        <a class="brand" href="#home" data-route="home" aria-label="RENTIFY home">RENTIFY<span aria-hidden="true">.</span></a>
+        <nav class="desktop-nav" aria-label="Primary navigation">
+          <a href="#home" data-route="home">Home</a>
+          <a href="#explore" data-route="explore">Explore</a>
+          <a href="#how-it-works" data-scroll="how-it-works">How it works</a>
+          <a href="#bookings" data-route="bookings">My rentals</a>
+        </nav>
+        <div class="header-actions">
+          <form class="header-search" data-header-search role="search">
+            <label class="visually-hidden" for="headerSearch">Search equipment</label>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+            <input id="headerSearch" type="search" name="q" placeholder="Search gear" autocomplete="off">
+          </form>
+          <a class="header-category-link" href="#explore" data-route="explore">Categories</a>
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Switch color theme" aria-pressed="false">
+            <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"></path></svg>
+            <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.1A8.5 8.5 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"></path></svg>
+          </button>
+          <a class="icon-button wishlist-button" href="#wishlist" data-route="wishlist" aria-label="Wishlist">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 1 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z"></path></svg>
+            <span class="count-badge" data-wishlist-count hidden>0</span>
+          </a>
+          <a class="icon-button account-link" href="#bookings" data-route="bookings" aria-label="Open account and rentals">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 20c.8-3.1 3.2-4.8 7.5-4.8s6.7 1.7 7.5 4.8"></path></svg>
+          </a>
+          <span class="header-user-label" data-user-label></span>
+          <a class="header-auth-link" href="#auth" data-route="auth" data-auth-menu-desktop>Sign in</a>
+          <a class="button button--secondary header-admin" href="#admin" data-route="admin">Admin demo</a>
+          <button class="icon-button menu-button" type="button" data-menu-toggle aria-controls="mobileMenu" aria-expanded="false" aria-label="Open navigation">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </div>
+      </div>
+      <div class="mobile-menu" id="mobileMenu" data-mobile-menu hidden>
+        <nav class="site-container mobile-menu__nav" aria-label="Mobile navigation">
+          <a href="#home" data-route="home">Home</a>
+          <a href="#explore" data-route="explore">Explore gear</a>
+          <a href="#how-it-works" data-scroll="how-it-works">How it works</a>
+          <a href="#bookings" data-route="bookings">My rentals</a>
+          <a href="#wishlist" data-route="wishlist">Wishlist</a>
+          <a href="#auth" data-route="auth" data-auth-menu>Sign in</a>
+          <a href="#admin" data-route="admin">Admin demo</a>
+        </nav>
+      </div>
+    </header>
+    <main id="app" tabindex="-1"></main>
+    <footer class="site-footer">
+      <div class="site-container footer-grid">
+        <div><a class="brand brand--footer" href="#home" data-route="home">RENTIFY<span>.</span></a><p>Good equipment, only for as long as you need it.</p></div>
+        <div class="footer-meta"><span>© 2026 RENTIFY</span><span>Frontend demo · No real transactions</span></div>
+      </div>
+    </footer>
+    <div id="modalRoot"></div>
+    <div class="toast-region" aria-live="polite" aria-atomic="true" data-toast-region></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script type="module" src="assets/js/app.js"></script>
+  </body>
+</html>
