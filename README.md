@@ -211,3 +211,4 @@ Additional validation performed:
 
 The source is ready to run directly from a clone; generated screenshots and
 submission archives are intentionally excluded from this repository.
+# RENTIFY
