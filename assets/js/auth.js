@@ -11,6 +11,14 @@ const demoAccounts = [
 
 const hash = (value) => Array.from(String(value)).reduce((total, character) => ((total * 31) + character.charCodeAt(0)) >>> 0, 7).toString(16);
 const normaliseEmail = (value) => String(value || '').trim().toLowerCase();
+const EMAIL_PATTERN = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
+
+export const isValidEmail = (value) => {
+  const email = normaliseEmail(value);
+  if (!email || email.length > 254) return false;
+  const [localPart] = email.split('@');
+  return localPart.length <= 64 && EMAIL_PATTERN.test(email);
+};
 
 const readJson = (key, fallback) => {
   try {
@@ -73,6 +81,7 @@ export const auth = {
   getUser: () => session,
   getAccounts: () => accounts.map(({ passwordHash, ...account }) => account),
   signIn(email, password, remember = true) {
+    if (!isValidEmail(email)) return { ok: false, error: 'Enter a valid email address (for example, name@example.com).' };
     const account = accounts.find((item) => item.email === normaliseEmail(email) && item.passwordHash === hash(password));
     if (!account) return { ok: false, error: 'Email or password does not match our demo accounts.' };
     if (account.active === false) return { ok: false, error: 'This demo account is deactivated. Contact the admin demo to restore access.' };
@@ -82,6 +91,7 @@ export const auth = {
   },
   register(name, email, password, remember = true, phone = '') {
     const cleanEmail = normaliseEmail(email);
+    if (!isValidEmail(cleanEmail)) return { ok: false, error: 'Enter a valid email address (for example, name@example.com).' };
     if (accounts.some((account) => account.email === cleanEmail)) return { ok: false, error: 'An account with this email already exists.' };
     const user = { id: `customer-${Date.now()}`, name: String(name).trim(), email: cleanEmail, phone: String(phone).trim(), role: 'customer' };
     accounts = [...accounts, { ...user, active: true, passwordHash: hash(password), demo: false }];

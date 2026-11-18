@@ -250,6 +250,16 @@ h3 { font-size: 1.05rem; }
 .demo-access__item span { font-size: .78rem; font-weight: 600; }
 .demo-access__item small { overflow: hidden; color: var(--muted); font-size: .64rem; text-overflow: ellipsis; }
 .auth-switch { margin: 22px 0 0; color: var(--muted); text-align: center; font-size: .78rem; }
+.validation-guide { position: relative; overflow: hidden; margin-top: 28px; padding: 20px; background: linear-gradient(145deg, var(--surface), color-mix(in srgb, var(--accent-soft) 55%, var(--surface))); border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border)); border-radius: 14px; box-shadow: 0 12px 30px color-mix(in srgb, var(--accent) 8%, transparent); }
+.validation-guide::after { position: absolute; top: -38px; right: -30px; width: 105px; height: 105px; content: ""; background: color-mix(in srgb, var(--accent) 8%, transparent); border-radius: 50%; pointer-events: none; }
+.validation-guide__heading { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+.validation-guide__heading .eyebrow { margin-bottom: 2px; font-size: .58rem; }
+.validation-guide__heading h2 { margin: 0; font-size: 1rem; letter-spacing: -.02em; }
+.validation-guide__mark { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; color: #fff; background: var(--accent); border-radius: 50%; font-size: .85rem; font-weight: 700; }
+.validation-guide ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.validation-guide li { display: grid; grid-template-columns: minmax(100px, .7fr) minmax(0, 1.3fr); gap: 14px; padding: 9px 0; border-top: 1px solid color-mix(in srgb, var(--border) 78%, transparent); }
+.validation-guide li span { color: var(--text); font-size: .72rem; font-weight: 600; }
+.validation-guide li small { color: var(--muted); font-size: .68rem; line-height: 1.45; }
 .onboarding-shell { min-height: calc(100vh - 135px); padding-block: 70px 100px; }
 .onboarding-progress { display: flex; gap: 28px; margin-bottom: 80px; color: var(--faint); font-size: .72rem; }
 .onboarding-progress span { position: relative; }
@@ -343,6 +353,7 @@ h3 { font-size: 1.05rem; }
   .auth-editorial__copy > p:not(.eyebrow), .auth-editorial__caption { display: none; }
   .auth-panel { display: block; padding: 38px 18px 55px; }
   .auth-heading h1 { font-size: 2.45rem; }
+  .validation-guide li { grid-template-columns: 1fr; gap: 2px; }
   .onboarding-shell { padding-block: 44px 70px; }
   .onboarding-progress { gap: 16px; margin-bottom: 50px; font-size: .65rem; }
   .preference-grid { grid-template-columns: repeat(2, 1fr); }

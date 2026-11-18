@@ -1,5 +1,5 @@
 import { categories, categoryImages, heroImage } from './data.js?seed=20261113';
-import { auth } from './auth.js';
+import { auth, isValidEmail } from './auth.js';
 import { customerStore } from './customerStore.js?demo=20261112';
 import { adminStore } from './adminStore.js?demo=20261112';
 import { store } from './store.js?demo=20261112';
@@ -44,6 +44,18 @@ const emptyState = (title, copy, action = '') => `
 
 const authView = () => {
   const isRegister = ui.authMode === 'register';
+  const validationRules = isRegister
+    ? [
+      ['Full name', 'At least 2 characters'],
+      ['Phone number', 'Exactly 10 digits'],
+      ['Email address', 'A complete address such as name@example.com'],
+      ['Password', '8+ characters with uppercase, lowercase, a number, and a symbol'],
+      ['Confirmation', 'Must exactly match your password'],
+    ]
+    : [
+      ['Email address', 'A complete address such as name@example.com'],
+      ['Password', 'At least 8 characters'],
+    ];
   return `<section class="auth-shell" aria-labelledby="auth-title">
     <aside class="auth-editorial" style="--auth-image: url('${heroImage}')">
       <a class="auth-brand" href="#home" data-route="home">RENTIFY<span>.</span></a>
@@ -54,7 +66,7 @@ const authView = () => {
       ${ui.authNotice ? `<div class="auth-notice" role="status">${escapeHtml(ui.authNotice)}</div>` : ''}
       <form class="auth-form" data-auth-form data-mode="${isRegister ? 'register' : 'signin'}" novalidate>
         ${isRegister ? `<label class="field"><span>Full name</span><input name="name" autocomplete="name" required maxlength="80" placeholder="Your name"><small class="field-error" aria-live="polite" data-error-for="name"></small></label><label class="field"><span>Phone number</span><input name="phone" type="tel" inputmode="numeric" autocomplete="tel" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit phone number"><small class="field-error" aria-live="polite" data-error-for="phone"></small></label>` : ''}
-        <label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com"><small class="field-error" aria-live="polite" data-error-for="email"></small></label>
+        <label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required maxlength="254" placeholder="you@example.com"><small class="field-error" aria-live="polite" data-error-for="email"></small></label>
         <label class="field"><span>Password</span><span class="password-control"><input name="password" type="password" autocomplete="${isRegister ? 'new-password' : 'current-password'}" required minlength="8" placeholder="8 characters minimum"><button type="button" class="password-toggle" data-password-toggle aria-label="Show password">Show</button></span><small class="field-error" aria-live="polite" data-error-for="password"></small>${isRegister ? '<span class="password-strength" data-password-strength>Password strength will appear here</span>' : ''}</label>
         ${isRegister ? `<label class="field"><span>Confirm password</span><span class="password-control"><input name="confirmPassword" type="password" autocomplete="new-password" required placeholder="Repeat your password"><button type="button" class="password-toggle" data-password-toggle aria-label="Show password">Show</button></span><small class="field-error" aria-live="polite" data-error-for="confirmPassword"></small></label>` : ''}
         <div class="auth-form__meta">${!isRegister ? '<button class="text-button" type="button" data-auth-action="forgot">Forgot password?</button>' : '<span>Use 8+ characters for this demo account.</span>'}<label class="remember-control"><input type="checkbox" name="remember" checked> Remember me</label></div>
@@ -64,6 +76,10 @@ const authView = () => {
       <div class="auth-divider"><span>or continue with a demo</span></div>
       <div class="demo-access"><button type="button" class="demo-access__item" data-demo-login="customer"><span>Customer demo</span><small>customer@rentify.demo</small></button><button type="button" class="demo-access__item" data-demo-login="admin"><span>Admin demo</span><small>admin@rentify.demo</small></button></div>
       <p class="auth-switch">${isRegister ? 'Already have an account?' : 'New to RENTIFY?'} <button type="button" class="text-button" data-auth-action="toggle-mode">${isRegister ? 'Sign in' : 'Create an account'}</button></p>
+      <aside class="validation-guide" aria-labelledby="validation-guide-title">
+        <div class="validation-guide__heading"><span class="validation-guide__mark" aria-hidden="true">✓</span><div><p class="eyebrow">Before you continue</p><h2 id="validation-guide-title">Validation checklist</h2></div></div>
+        <ul>${validationRules.map(([label, rule]) => `<li><span>${label}</span><small>${rule}</small></li>`).join('')}</ul>
+      </aside>
     </div></div>
   </section>`;
 };
@@ -894,6 +910,15 @@ document.addEventListener('input', (event) => {
       strength.dataset.level = score < 2 ? 'weak' : score < 4 ? 'good' : 'strong';
     }
   }
+  if (event.target.matches('[data-auth-form] input')) {
+    const field = event.target.closest('.field');
+    const error = field?.querySelector('[data-error-for]');
+    if (error?.textContent) {
+      error.textContent = '';
+      field.classList.remove('has-error');
+      event.target.setAttribute('aria-invalid', 'false');
+    }
+  }
 });
 
 document.addEventListener('submit', (event) => {
@@ -948,7 +973,7 @@ document.addEventListener('submit', (event) => {
     const errors = {};
     if (mode === 'register' && String(values.name || '').trim().length < 2) errors.name = 'Enter your name.';
     if (mode === 'register' && !/^\d{10}$/.test(String(values.phone || ''))) errors.phone = 'Enter a valid 10-digit phone number.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(values.email || ''))) errors.email = 'Enter a valid email address.';
+    if (!isValidEmail(values.email)) errors.email = 'Enter a valid email address, such as name@example.com.';
     if (String(values.password || '').length < 8) errors.password = 'Use at least 8 characters.';
     if (mode === 'register' && !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/.test(String(values.password || ''))) errors.password = 'Use uppercase, lowercase, a number, and a symbol.';
     if (mode === 'register' && values.password !== values.confirmPassword) errors.confirmPassword = 'Passwords do not match.';
