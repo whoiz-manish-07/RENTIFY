@@ -12,13 +12,41 @@ const demoAccounts = [
 const hash = (value) => Array.from(String(value)).reduce((total, character) => ((total * 31) + character.charCodeAt(0)) >>> 0, 7).toString(16);
 const normaliseEmail = (value) => String(value || '').trim().toLowerCase();
 const EMAIL_PATTERN = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
+const BLOCKED_EMAIL_DOMAINS = new Set([
+  'example.com', 'example.net', 'example.org', 'mailinator.com', 'guerrillamail.com',
+  'guerrillamailblock.com', 'sharklasers.com', 'yopmail.com', '10minutemail.com',
+  'temp-mail.org', 'tempmail.com', 'trashmail.com', 'fakeinbox.com', 'dispostable.com',
+]);
+const COMMON_DOMAIN_TYPOS = new Map([
+  ['gamil.com', 'gmail.com'], ['gmial.com', 'gmail.com'], ['gmai.com', 'gmail.com'],
+  ['gmail.co', 'gmail.com'], ['yahooo.com', 'yahoo.com'], ['yaho.com', 'yahoo.com'],
+  ['hotnail.com', 'hotmail.com'], ['hotmai.com', 'hotmail.com'], ['outlok.com', 'outlook.com'],
+  ['outllook.com', 'outlook.com'], ['icloud.co', 'icloud.com'],
+]);
 
-export const isValidEmail = (value) => {
-  const email = normaliseEmail(value);
-  if (!email || email.length > 254) return false;
-  const [localPart] = email.split('@');
-  return localPart.length <= 64 && EMAIL_PATTERN.test(email);
+export const getEmailValidationError = (value) => {
+  const rawEmail = String(value || '');
+  const email = normaliseEmail(rawEmail);
+  if (!email) return 'Email address is required.';
+  if (email.length > 254) return 'Email address is too long.';
+  if (rawEmail !== rawEmail.trim()) return 'Remove spaces before or after the email address.';
+
+  const parts = email.split('@');
+  if (parts.length !== 2) return 'Use one @ symbol in the email address.';
+  const [localPart, domain] = parts;
+  if (localPart.length > 64) return 'The part before @ is too long.';
+  if (!EMAIL_PATTERN.test(email)) return 'Enter a complete email such as name@gmail.com.';
+
+  // The seeded frontend demo accounts intentionally use this private demo domain.
+  if (domain === 'rentify.demo') return '';
+  if (COMMON_DOMAIN_TYPOS.has(domain)) return `Check the domain. Did you mean ${COMMON_DOMAIN_TYPOS.get(domain)}?`;
+  if (BLOCKED_EMAIL_DOMAINS.has(domain) || [...BLOCKED_EMAIL_DOMAINS].some((blocked) => domain.endsWith(`.${blocked}`))) {
+    return 'Temporary, placeholder, and disposable email addresses are not allowed.';
+  }
+  return '';
 };
+
+export const isValidEmail = (value) => !getEmailValidationError(String(value || ''));
 
 const readJson = (key, fallback) => {
   try {
@@ -81,7 +109,8 @@ export const auth = {
   getUser: () => session,
   getAccounts: () => accounts.map(({ passwordHash, ...account }) => account),
   signIn(email, password, remember = true) {
-    if (!isValidEmail(email)) return { ok: false, error: 'Enter a valid email address (for example, name@example.com).' };
+    const emailError = getEmailValidationError(String(email || ''));
+    if (emailError) return { ok: false, error: emailError };
     const account = accounts.find((item) => item.email === normaliseEmail(email) && item.passwordHash === hash(password));
     if (!account) return { ok: false, error: 'Email or password does not match our demo accounts.' };
     if (account.active === false) return { ok: false, error: 'This demo account is deactivated. Contact the admin demo to restore access.' };
@@ -91,7 +120,8 @@ export const auth = {
   },
   register(name, email, password, remember = true, phone = '') {
     const cleanEmail = normaliseEmail(email);
-    if (!isValidEmail(cleanEmail)) return { ok: false, error: 'Enter a valid email address (for example, name@example.com).' };
+    const emailError = getEmailValidationError(String(email || ''));
+    if (emailError) return { ok: false, error: emailError };
     if (accounts.some((account) => account.email === cleanEmail)) return { ok: false, error: 'An account with this email already exists.' };
     const user = { id: `customer-${Date.now()}`, name: String(name).trim(), email: cleanEmail, phone: String(phone).trim(), role: 'customer' };
     accounts = [...accounts, { ...user, active: true, passwordHash: hash(password), demo: false }];
